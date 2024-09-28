@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스마트 점수판</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+</head>
+<body class="bg-gradient-to-r from-blue-500 to-purple-600 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-lg text-center">
+        <div class="flex justify-center items-center mb-4">
+            <svg class="w-12 h-12 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 16C20 17.1046 19.1046 18 18 18H6C4.89543 18 4 17.1046 4 16V8C4 6.89543 4.89543 6 6 6H18C19.1046 6 20 6.89543 20 8V16Z" stroke="#4A5568" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 14C13.1046 14 14 13.1046 14 12C14 10.8954 13.1046 10 12 10C10.8954 10 10 10.8954 10 12C10 13.1046 10.8954 14 12 14Z" fill="#4A5568"/>
+                <path d="M16 8V7C16 5.34315 14.6569 4 13 4H11C9.34315 4 8 5.34315 8 7V8" stroke="#4A5568" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <h1 class="text-4xl font-bold text-gray-800 animate__animated animate__bounce">스마트 점수판</h1>
+        </div>
+        <div class="text-6xl font-bold mb-4 text-blue-600" id="score">0</div>
+        <div class="text-3xl font-bold mb-6 text-gray-600" id="timer">00:00</div>
+        <div class="flex justify-center space-x-4 mb-4">
+            <button onclick="changeScore(1)" class="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-full text-3xl transition duration-300 ease-in-out transform hover:scale-110">
+                +
+            </button>
+            <button onclick="changeScore(-1)" class="bg-red-500 hover:bg-red-600 text-white font-bold py-4 px-8 rounded-full text-3xl transition duration-300 ease-in-out transform hover:scale-110">
+                -
+            </button>
+        </div>
+        <div class="flex justify-center space-x-4">
+            <button onclick="resetScore()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+                초기화
+            </button>
+            <button onclick="toggleTimer()" id="timerButton" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+                타이머 시작
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let timerInterval;
+        let timerSeconds = 0;
+        let timerRunning = false;
+        const scoreElement = document.getElementById('score');
+        const timerElement = document.getElementById('timer');
+        const timerButton = document.getElementById('timerButton');
+
+        function changeScore(amount) {
+            score += amount;
+            scoreElement.textContent = score;
+            scoreElement.classList.add('animate__animated', 'animate__rubberBand');
+            setTimeout(() => {
+                scoreElement.classList.remove('animate__animated', 'animate__rubberBand');
+            }, 1000);
+
+            if (score % 10 === 0 && score !== 0) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+
+        function resetScore() {
+            score = 0;
+            scoreElement.textContent = score;
+            scoreElement.classList.add('animate__animated', 'animate__fadeIn');
+            setTimeout(() => {
+                scoreElement.classList.remove('animate__animated', 'animate__fadeIn');
+            }, 1000);
+        }
+
+        function toggleTimer() {
+            if (timerRunning) {
+                clearInterval(timerInterval);
+                timerButton.textContent = '타이머 시작';
+                timerRunning = false;
+            } else {
+                timerInterval = setInterval(updateTimer, 1000);
+                timerButton.textContent = '타이머 정지';
+                timerRunning = true;
+            }
+        }
+
+        function updateTimer() {
+            timerSeconds++;
+            const minutes = Math.floor(timerSeconds / 60);
+            const seconds = timerSeconds % 60;
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timerSeconds = 0;
+            timerElement.textContent = '00:00';
+            timerButton.textContent = '타이머 시작';
+            timerRunning = false;
+        }
+    </script>
+</body>
+</html>
